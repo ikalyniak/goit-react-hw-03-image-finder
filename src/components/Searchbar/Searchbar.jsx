@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 import styles from './Searchbar.module.css';
 
@@ -8,25 +9,30 @@ export default class Searchbar extends React.Component {
   };
 
   handleInput = event => {
-    this.setState({ searchInput: event.currenTarget.value.toLowerCase() });
+    this.setState({ searchInput: event.currentTarget.value.toLowerCase() });
   };
 
-  handleChange = event => {
+  handleSubmit = event => {
     event.preventDefault();
 
-    this.props.Submit(this.state.searchInput);
+    if (this.state.searchInput.trim() === '') {
+      return toast.error('Please enter your query!');
+    }
+
+    this.props.submit(this.state.searchInput);
     this.setState({ searchInput: '' });
   };
 
   render() {
     return (
       <header className={styles.Searchbar}>
-        <form className={styles.SearchForm}>
+        <form className={styles.SearchForm} onSubmit={this.handleSubmit}>
           <button type="submit" className={styles.SearchFormButton}>
             <span className={styles.SearchFormButtonLabel}>Search</span>
           </button>
 
           <input
+            onChange={this.handleInput}
             className={styles.SearchFormInput}
             type="text"
             autoComplete="off"
