@@ -16,7 +16,7 @@ export default class Searchbar extends React.Component {
     event.preventDefault();
 
     if (this.state.searchInput.trim() === '') {
-      return toast.error('Please enter your query!');
+      return toast.error('Please type your query!');
     }
 
     this.props.submit(this.state.searchInput);
@@ -38,6 +38,7 @@ export default class Searchbar extends React.Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
+            value={this.state.searchInput}
           />
         </form>
       </header>
