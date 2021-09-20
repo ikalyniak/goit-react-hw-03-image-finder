@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import styles from './ImageGalleryItem.module.css';
+
 class ImageGalleryItem extends React.Component {
   static propTypes = {
     key: PropTypes.string.isRequired,
@@ -10,10 +12,13 @@ class ImageGalleryItem extends React.Component {
   };
 
   render() {
-    const { src, onLargeImg, largeImg } = this.props;
+    const { src, onLargeImg, largeImg, alt } = this.props;
     return (
-      <li className="ImageGalleryItem" onClick={() => onLargeImg(largeImg)}>
-        <img src={src} alt="" className="ImageGalleryItem-image" />
+      <li
+        className={styles.ImageGalleryItem}
+        onClick={() => onLargeImg(largeImg)}
+      >
+        <img src={src} alt={alt} className={styles.ImageGalleryItemImage} />
       </li>
     );
   }

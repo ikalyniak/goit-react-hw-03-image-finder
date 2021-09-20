@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
+import Button from '../Button/Button';
 import styles from './ImageGallery.module.css';
 
 const API_KEY = '22540552-ad6fedb3f5750c17229d327bb';
@@ -27,10 +28,33 @@ class ImageGallery extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
+    const { images, page, perPage } = this.state;
+    const { searchQuery } = this.props;
+
+    if (prevProps.searchQuery !== searchQuery) {
       this.setState({ status: STATUS.pending });
       fetch(
-        `${BASE_URL}?q=${this.props.searchQuery}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`,
+        `${BASE_URL}?q=${this.props.searchQuery}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`,
+      )
+        .then(response => response.json())
+        .then(data => {
+          if (data.hits.length > 0) {
+            this.setState({
+              images: [...data.hits],
+              status: STATUS.resolved,
+            });
+          } else toast.error(`no data on your request '${searchQuery}'`);
+        })
+        .catch(error => {
+          this.setState({ status: STATUS.rejected, error });
+          toast.error(`${error.message}`);
+        });
+    }
+
+    if (prevState.page !== page) {
+      this.setState({ status: STATUS.pending });
+      fetch(
+        `${BASE_URL}?q=${this.props.searchQuery}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`,
       )
         .then(response => response.json())
         .then(data => {
@@ -39,25 +63,40 @@ class ImageGallery extends React.Component {
               images: [...prevState.images, ...data.hits],
               status: STATUS.resolved,
             });
-          } else
-            toast.error(`no data on your request '${this.props.searchQuery}'`);
+          } else toast.error(`no data on your request '${searchQuery}'`);
         })
         .catch(error => {
           this.setState({ status: STATUS.rejected, error });
           toast.error(`${error.message}`);
         });
     }
+
+    this.scrolling();
   }
+
+  scrolling = () => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 1000);
+  };
+
+  handleLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
   render() {
-    const { status } = this.state;
+    const { images, status, error } = this.state;
 
     if (status === STATUS.idle) {
-      return <h2>---idle---</h2>;
+      return <h2 className={styles.inscription}>Please type your query!</h2>;
     }
 
     if (status === STATUS.pending) {
       return (
-        <div className="loaderWrapper">
+        <div className={styles.loader}>
           <Loader
             type="ThreeDots"
             color="#00BFFF"
@@ -70,21 +109,25 @@ class ImageGallery extends React.Component {
     }
 
     if (status === STATUS.rejected) {
-      return <h2>--rejected---</h2>;
+      return <h2 className={styles.inscription}>{error.message}</h2>;
     }
 
     if (status === STATUS.resolved) {
       return (
-        <ul className={styles.ImageGallery}>
-          {this.state.images.map(image => (
-            <ImageGalleryItem
-              key={image.id}
-              src={image.webformatURL}
-              largeImg={image.largeImageURL}
-              onClick={this.props.onClick}
-            />
-          ))}
-        </ul>
+        <>
+          <ul className={styles.ImageGallery}>
+            {images.map(image => (
+              <ImageGalleryItem
+                key={image.id}
+                src={image.webformatURL}
+                largeImg={image.largeImageURL}
+                onClick={this.props.onClick}
+                alt={image.tags}
+              />
+            ))}
+          </ul>
+          <Button loadMore={this.handleLoadMore} />
+        </>
       );
     }
   }
