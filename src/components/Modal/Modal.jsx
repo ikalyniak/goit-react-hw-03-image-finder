@@ -27,10 +27,7 @@ class Modal extends Component {
     return createPortal(
       <div className={styles.Overlay} onClick={this.handleBackdropClick}>
         <div className={styles.Modal}>
-          <img
-            src="https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
-            alt="this.props.largeImg"
-          />
+          <img src={this.props.modalImg} alt="this.props.largeImg" />
         </div>
       </div>,
       modalRoot,

@@ -94,9 +94,10 @@ class ImageGallery extends React.Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
+  toggleModal = url => {
+    this.setState(({ showModal, modalImageURL }) => ({
       showModal: !showModal,
+      modalImageURL: url,
     }));
   };
 
@@ -140,7 +141,12 @@ class ImageGallery extends React.Component {
             ))}
           </ul>
           <Button loadMore={this.handleLoadMore} />
-          {showModal && <Modal onModal={this.toggleModal} />}
+          {showModal && (
+            <Modal
+              onModal={this.toggleModal}
+              modalImg={this.state.modalImageURL}
+            />
+          )}
         </>
       );
     }
