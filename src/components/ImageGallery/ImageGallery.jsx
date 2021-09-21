@@ -28,6 +28,7 @@ class ImageGallery extends React.Component {
     error: null,
     showModal: false,
     modalImageURL: '',
+    modalImageALT: '',
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -82,22 +83,21 @@ class ImageGallery extends React.Component {
   }
 
   scrolling = () => {
-    setTimeout(() => {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth',
-      });
-    }, 1000);
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
   };
 
   handleLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  toggleModal = url => {
-    this.setState(({ showModal, modalImageURL }) => ({
+  toggleModal = (url, alt) => {
+    this.setState(({ showModal }) => ({
       showModal: !showModal,
       modalImageURL: url,
+      modalImageALT: alt,
     }));
   };
 
@@ -145,6 +145,7 @@ class ImageGallery extends React.Component {
             <Modal
               onModal={this.toggleModal}
               modalImg={this.state.modalImageURL}
+              modalImgALT={this.state.modalImageALT}
             />
           )}
         </>
