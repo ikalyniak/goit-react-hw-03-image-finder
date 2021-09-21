@@ -15,13 +15,6 @@ class App extends React.Component {
     this.setState({ searchInput: data });
   };
 
-  //
-  // .then(data =>
-  //   this.setState({
-  //     images: [...data.hits],
-  //   }),
-  // );
-
   render() {
     return (
       <div className="App">

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Button from '../Button/Button';
+import Modal from '../Modal/Modal';
 import styles from './ImageGallery.module.css';
 
 const API_KEY = '22540552-ad6fedb3f5750c17229d327bb';
@@ -25,10 +26,12 @@ class ImageGallery extends React.Component {
     perPage: 12,
     status: STATUS.idle,
     error: null,
+    showModal: false,
+    modalImageURL: '',
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { images, page, perPage } = this.state;
+    const { page, perPage } = this.state;
     const { searchQuery } = this.props;
 
     if (prevProps.searchQuery !== searchQuery) {
@@ -46,7 +49,11 @@ class ImageGallery extends React.Component {
           } else toast.error(`no data on your request '${searchQuery}'`);
         })
         .catch(error => {
-          this.setState({ status: STATUS.rejected, error });
+          this.setState({
+            status: STATUS.rejected,
+            error,
+            images: [],
+          });
           toast.error(`${error.message}`);
         });
     }
@@ -87,8 +94,14 @@ class ImageGallery extends React.Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
   render() {
-    const { images, status, error } = this.state;
+    const { images, status, error, showModal } = this.state;
 
     if (status === STATUS.idle) {
       return <h2 className={styles.inscription}>Please type your query!</h2>;
@@ -121,12 +134,13 @@ class ImageGallery extends React.Component {
                 key={image.id}
                 src={image.webformatURL}
                 largeImg={image.largeImageURL}
-                onClick={this.props.onClick}
+                onModal={this.toggleModal}
                 alt={image.tags}
               />
             ))}
           </ul>
           <Button loadMore={this.handleLoadMore} />
+          {showModal && <Modal onModal={this.toggleModal} />}
         </>
       );
     }
